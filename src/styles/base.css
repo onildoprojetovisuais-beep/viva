@@ -101,6 +101,9 @@ body.no-webgl { background: var(--color-solo-navy); }
 }
 .brand-mark { display: inline-flex; color: var(--color-campo-aberto); }
 .brand-mark__logo { width: clamp(76px, 7vw, 100px); height: auto; }
+@media (max-width: 767px) {
+  .brand-mark__logo { width: 112px; }
+}
 .site-nav { display: flex; align-items: center; gap: 1.75rem; }
 .site-nav__link {
   font-size: .88rem; font-weight: 500; color: rgba(237, 237, 237, .82);
@@ -298,33 +301,32 @@ main#scroll-content { position: relative; z-index: 1; }
 }
 .stage--manifest .heading,
 .stage--manifest .body-text,
-.stage--manifest .signature,
 .stage--manifest .scenario__name,
 .stage--manifest .scenario__desc,
 .stage--manifest .scenario__delta { text-shadow: 0 2px 16px rgba(0, 0, 3, .4); }
 
-.signature--closing {
-  margin-top: clamp(3rem, 6vw, 4.5rem);
-  padding-top: clamp(1.75rem, 3.5vw, 2.5rem);
-  border-top: var(--border-hairline);
-  font-size: clamp(1.5rem, 2.8vw, 2.1rem);
-}
-.signature--logo {
-  width: clamp(220px, 26vw, 340px);
-  height: auto;
-}
-
 /* ---- Cenários (MANTER / AMPLIAR / REVISAR) — leitura editorial, não dashboard:
    mesma régua de linhas finas do resto do site (pillar-list), com um valor
    numérico curto por linha em vez de ícone. O VIVA mostra os caminhos; nenhum
-   deles vem pré-selecionado ou destacado como "certo". ---- */
+   deles vem pré-selecionado ou destacado como "certo".
+
+   Grid (não flex) por escolha deliberada: a assinatura precisa fechar a coluna
+   esquerda no desktop (sob o parágrafo) mas vir depois dos cenários no mobile —
+   mesma ordem de DOM nos dois casos, só a área de grid muda por breakpoint. ---- */
 .agencia-grid {
-  display: flex;
-  flex-direction: column;
+  display: grid;
   gap: clamp(2.5rem, 6vw, 4rem);
 }
 .agencia-text { max-width: 46ch; }
 .scenario-list { display: flex; flex-direction: column; }
+/* assinatura de fechamento — presença de marca, não bloco gráfico: segue o
+   parágrafo como consequência do conteúdo, sem linha divisória nem respiro
+   de "rodapé". */
+.agencia-signature {
+  width: 150px;
+  height: auto;
+  margin-top: 1.25rem;
+}
 .scenario { padding: 1.35rem 0; border-top: var(--border-hairline); }
 .scenario:first-child { border-top: none; padding-top: 0; }
 .scenario:last-of-type { border-bottom: var(--border-hairline); padding-bottom: 1.35rem; }
@@ -348,8 +350,23 @@ main#scroll-content { position: relative; z-index: 1; }
 }
 
 @media (min-width: 860px) {
-  .agencia-grid { flex-direction: row; align-items: center; gap: clamp(3rem, 6vw, 5rem); }
-  .agencia-text, .scenario-list { flex: 1; min-width: 0; }
+  .agencia-grid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "text      scenarios"
+      "signature scenarios";
+    align-items: start;
+    column-gap: clamp(3rem, 6vw, 5rem);
+    row-gap: 0;
+  }
+  .agencia-text { grid-area: text; }
+  .scenario-list { grid-area: scenarios; align-self: center; }
+  .agencia-signature {
+    grid-area: signature;
+    align-self: start;
+    width: clamp(180px, 14vw, 220px);
+    margin-top: clamp(1.25rem, 2.5vw, 1.75rem);
+  }
 }
 
 /* ---- Mobile — cada cenário vira um momento editorial vertical, não uma
@@ -377,14 +394,6 @@ main#scroll-content { position: relative; z-index: 1; }
   /* nota legal — presença reduzida, logo após o último cenário, sem competir
      com o fechamento que vem a seguir. */
   .scenario-list__caption { margin-top: .75rem; font-size: .66rem; opacity: .38; }
-
-  /* assinatura — conclusão conceitual da seção, não rodapé: respiro maior e
-     mais peso do que a versão desktop. */
-  .signature--closing {
-    margin-top: clamp(3.5rem, 13vw, 5rem);
-    padding-top: clamp(2rem, 7vw, 2.75rem);
-    font-size: clamp(1.65rem, 8vw, 2rem);
-  }
 }
 
 .lede {
@@ -406,8 +415,6 @@ main#scroll-content { position: relative; z-index: 1; }
   color: rgba(237, 237, 237, .82);
 }
 .stage--dado .body-text, .stage--silencio .body-text { color: rgba(26, 26, 26, .78); }
-
-.signature { margin-top: 2rem; font-style: italic; font-weight: 300; font-size: 1.2rem; }
 
 .caption {
   margin-top: 1.75rem;
