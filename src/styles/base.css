@@ -1,0 +1,1078 @@
+@font-face {
+  font-family: "Inter";
+  src: url("/assets/fonts/Inter-VariableFont_opsz,wght.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Inter";
+  src: url("/assets/fonts/Inter-Italic-VariableFont_opsz,wght.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+:root {
+  --color-campo-aberto: #EDEDED;
+  --color-motriz: #EE2629;
+  --color-solo-navy: #000541;
+  --color-solo-black: #1A1A1A;
+  --color-ink: var(--color-solo-black);
+
+  --font-body: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* voz técnica/dado — só para rótulos e leitura de valores, nunca para prosa (mesmo
+     papel que JetBrains Mono cumpre na REF-004: rótulo de sistema, não corpo de texto) */
+  --font-mono: ui-monospace, "SFMono-Regular", "JetBrains Mono", Menlo, Consolas, monospace;
+  --container-max: 960px;
+  --container-narrow: 620px;
+  --edge: clamp(1.25rem, 4vw, 3rem);
+  --ease-field: cubic-bezier(.16, 1, .3, 1);
+  --ease-atmosphere: cubic-bezier(.45, .03, .52, .96);
+
+  /* tokens de sistema — spacing/radius/borda/motion reutilizados nos módulos
+     em grade (pilares, demonstração, jornada, evidência) para consistência
+     entre seções em vez de valores soltos repetidos por componente. */
+  --radius-sm: 10px;
+  --radius-md: 18px;
+  --radius-lg: 28px;
+  --border-hairline: 1px solid rgba(237, 237, 237, .1);
+  --border-hairline-ink: 1px solid rgba(26, 26, 26, .14);
+  --motion-quick: .3s;
+  --motion-base: .5s;
+  --stagger-step: .08s;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { width: 100%; overflow-x: hidden; }
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--color-ink);
+  background: var(--color-campo-aberto);
+  line-height: 1.5;
+  font-feature-settings: "tnum" 1;
+}
+img, svg { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+h1, h2, h3, p, ol { margin: 0; }
+ol { padding: 0; list-style: none; }
+
+/* foco de teclado — visível em qualquer estágio (claro ou escuro), nunca suprimido */
+a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
+  outline: 2px solid var(--color-motriz);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ==========================================================================
+   Canvas do CAMPO — fixo, persistente, atrás de todo o conteúdo
+   ========================================================================== */
+
+#field-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  display: block;
+  background: var(--color-solo-navy);
+}
+/* sem suporte a WebGL: canvas nunca é inicializado/exibido (ver main.ts) */
+body.no-webgl #field-canvas { display: none; }
+body.no-webgl { background: var(--color-solo-navy); }
+
+/* ==========================================================================
+   Header
+   ========================================================================== */
+
+.site-header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .85rem var(--edge);
+  background: rgba(0, 5, 65, .7);
+  border-bottom: 1px solid rgba(237, 237, 237, .08);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+.brand-mark { display: inline-flex; color: var(--color-campo-aberto); }
+.brand-mark__logo { width: clamp(76px, 7vw, 100px); height: auto; }
+.site-nav { display: flex; align-items: center; gap: 1.75rem; }
+.site-nav__link {
+  font-size: .88rem; font-weight: 500; color: rgba(237, 237, 237, .82);
+  transition: color var(--motion-quick) var(--ease-field);
+}
+@media (hover: hover) { .site-nav__link:hover { color: var(--color-campo-aberto); } }
+.site-nav__link--cta {
+  padding: .6rem 1.15rem;
+  border-radius: 999px;
+  border: 1px solid rgba(237, 237, 237, .5);
+  color: var(--color-campo-aberto);
+  transition: border-color var(--motion-quick) var(--ease-field), background-color var(--motion-quick) var(--ease-field);
+}
+@media (hover: hover) {
+  .site-nav__link--cta:hover { border-color: var(--color-campo-aberto); background: rgba(237, 237, 237, .06); }
+}
+
+/* ==========================================================================
+   Estrutura de estágio
+   ========================================================================== */
+
+main#scroll-content { position: relative; z-index: 1; }
+
+.stage {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: clamp(5rem, 10vw, 8rem) var(--edge);
+  background: transparent;
+}
+.stage__inner { max-width: var(--container-max); margin-inline: auto; }
+.stage__inner--narrow { max-width: var(--container-narrow); }
+.stage__inner--cta { max-width: 760px; }
+.stage__inner--wide { max-width: 1220px; }
+
+.stage__inner--media {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+.stage__media img {
+  width: 100%;
+  height: auto;
+  border-radius: 20px;
+}
+@media (min-width: 860px) {
+  .stage__inner--media {
+    flex-direction: row;
+    align-items: center;
+    gap: clamp(2.5rem, 5vw, 4.5rem);
+  }
+  .stage__media, .stage__media-text { flex: 1; min-width: 0; }
+}
+
+/* estágios "opacos" — o campo some visualmente atrás deles (silêncio/respiração) */
+.stage--dado,
+.stage--silencio {
+  background: var(--color-campo-aberto);
+  color: var(--color-ink);
+}
+.stage--decisao {
+  background: var(--color-solo-navy);
+  color: var(--color-campo-aberto);
+}
+
+/* estágios "transparentes" — o campo aparece por trás (imersivo). Sombra sutil de
+   legibilidade: o campo-gradiente é animado e pode clarear sob o texto (flare), então
+   o texto precisa de uma garantia mínima de contraste que não dependa da cor exata
+   do campo naquele instante — nunca um efeito decorativo, só uma rede de segurança. */
+.stage--hero,
+.stage--leitura-inicio,
+.stage--demo,
+.stage--loop,
+.stage--resolucao {
+  color: var(--color-campo-aberto);
+}
+.stage--hero .display,
+.stage--hero .lede,
+.stage--leitura-inicio .heading,
+.stage--leitura-inicio .pillar-list__desc,
+.stage--demo .heading,
+.stage--demo .demo__lede,
+.stage--loop .heading,
+.stage--loop .body-text,
+.stage--resolucao .heading,
+.stage--resolucao .body-text {
+  text-shadow: 0 2px 16px rgba(0, 0, 3, .4);
+}
+
+#hero.stage { min-height: 100vh; }
+
+/* Demonstração Visual — seção alta, sem pin: o scroll é a experiência (ver
+   src/demo/panel.ts). Um scrim escurece o campo por trás para os cards serem
+   protagonistas — o campo continua vivo, só não compete mais pela atenção. */
+.stage--demo {
+  padding: clamp(4rem, 8vw, 6rem) 0;
+  align-items: flex-start;
+  background: linear-gradient(180deg, rgba(0, 5, 65, .72), rgba(0, 5, 65, .58) 30%, rgba(0, 5, 65, .72));
+}
+.demo__inner { max-width: 1360px; margin-inline: auto; width: 100%; padding-inline: var(--edge); }
+.demo__lede {
+  font-size: clamp(.95rem, 1.3vw, 1.05rem);
+  font-weight: 300;
+  color: rgba(237, 237, 237, .72);
+  max-width: 56ch;
+  margin-top: -.5rem;
+  margin-bottom: clamp(2.5rem, 6vw, 4rem);
+}
+
+/* ==========================================================================
+   Tipografia
+   ========================================================================== */
+
+/* marcador — o vermelho carrega a marca, o texto sempre usa a cor de máximo contraste
+   do próprio contexto (nunca vermelho-sobre-vermelho ou vermelho-sobre-escuro marginal).
+   Voz mono, minúscula e rastreada — a "etiqueta de sistema", nunca a voz de leitura. */
+.eyebrow, .kicker {
+  display: flex;
+  align-items: center;
+  gap: .55em;
+  font-family: var(--font-mono);
+  font-size: .74rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+.eyebrow::before, .kicker::before {
+  content: "";
+  width: .55em; height: .55em;
+  background: var(--color-motriz);
+  border-radius: 1px;
+  flex: none;
+}
+
+/* voz editorial — peso whisper (300), escala grande, entrelinha fechada. A restrição
+   de peso é deliberada: autoridade pela contenção, não pelo negrito (mesmo princípio
+   herdado do Caminho 3 na Direction, agora expresso na tipografia). */
+.display {
+  font-size: clamp(2.75rem, 8vw, 6.75rem);
+  font-weight: 300;
+  line-height: .95;
+  letter-spacing: -.015em;
+  max-width: 16ch;
+  margin-bottom: 1.75rem;
+}
+.heading {
+  font-size: clamp(1.9rem, 4.6vw, 3.4rem);
+  font-weight: 300;
+  line-height: 1.02;
+  letter-spacing: -.01em;
+  max-width: 18ch;
+  margin-bottom: 1.5rem;
+}
+.heading--on-field { color: var(--color-campo-aberto); }
+.stage--resolucao .heading { line-height: 1.18; }
+/* Jornada — ~13% menor que o heading padrão e com menos margem embaixo, para
+   headline, régua de passos e texto de apoio lerem como uma composição só,
+   não três blocos empilhados com respiro de seção inteira entre eles. */
+.heading--loop { font-size: clamp(1.65rem, 4vw, 3rem); margin-bottom: 1rem; }
+/* fechamento (#cta-final) — mesmo peso do hero (.display), para a página abrir
+   e fechar na mesma intensidade tipográfica em vez de esvaziar no centro. */
+.heading--resolucao {
+  font-size: clamp(2.75rem, 7vw, 5.5rem);
+  line-height: .98;
+  max-width: 15ch;
+  margin-bottom: 1.75rem;
+}
+/* luz difusa que segue o cursor — reforça "revelar o que estava atrás do dado"
+   sem competir com o campo em si. Só desktop com ponteiro fino real (ver
+   src/motion/cta-light.ts); em qualquer outro contexto fica só o campo. */
+#cta-final { position: relative; }
+.cta-light {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .8s var(--ease-field);
+  background: radial-gradient(560px circle at var(--cta-x, 50%) var(--cta-y, 42%), rgba(255, 255, 255, .06), transparent 65%);
+}
+@media (hover: hover) {
+  #cta-final.is-glowing .cta-light { opacity: 1; }
+}
+/* manifesto (#agencia) — mesma voz editorial do resto do site, só que maior:
+   nenhum card, gráfico ou imagem compete com a frase; o protagonismo vem
+   inteiramente da escala e do respiro ao redor dela. */
+.heading--manifest { font-size: clamp(2.25rem, 4.6vw, 3.75rem); max-width: 12ch; margin-bottom: 1.75rem; }
+.stage--manifest { padding-block: clamp(6rem, 11vw, 9rem); }
+/* transição contínua para o CTA: o navy sólido some perto da base da seção,
+   o campo (já na composição "decisão", calma) começa a aparecer por trás —
+   o mesmo fundo que domina o #cta-final logo em seguida, sem corte. */
+.stage--manifest.stage--decisao {
+  background: linear-gradient(180deg, var(--color-solo-navy) 0%, var(--color-solo-navy) 72%, transparent 100%);
+}
+.stage--manifest .heading,
+.stage--manifest .body-text,
+.stage--manifest .signature,
+.stage--manifest .scenario__name,
+.stage--manifest .scenario__desc,
+.stage--manifest .scenario__delta { text-shadow: 0 2px 16px rgba(0, 0, 3, .4); }
+
+.signature--closing {
+  margin-top: clamp(3rem, 6vw, 4.5rem);
+  padding-top: clamp(1.75rem, 3.5vw, 2.5rem);
+  border-top: var(--border-hairline);
+  font-size: clamp(1.5rem, 2.8vw, 2.1rem);
+}
+.signature--logo {
+  width: clamp(220px, 26vw, 340px);
+  height: auto;
+}
+
+/* ---- Cenários (MANTER / AMPLIAR / REVISAR) — leitura editorial, não dashboard:
+   mesma régua de linhas finas do resto do site (pillar-list), com um valor
+   numérico curto por linha em vez de ícone. O VIVA mostra os caminhos; nenhum
+   deles vem pré-selecionado ou destacado como "certo". ---- */
+.agencia-grid {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2.5rem, 6vw, 4rem);
+}
+.agencia-text { max-width: 46ch; }
+.scenario-list { display: flex; flex-direction: column; }
+.scenario { padding: 1.35rem 0; border-top: var(--border-hairline); }
+.scenario:first-child { border-top: none; padding-top: 0; }
+.scenario:last-of-type { border-bottom: var(--border-hairline); padding-bottom: 1.35rem; }
+.scenario__head { display: flex; align-items: baseline; justify-content: space-between; gap: 1.5rem; margin-bottom: .5rem; }
+.scenario__name { font-family: var(--font-mono); font-size: .82rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; }
+.scenario__delta {
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum" 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: rgba(237, 237, 237, .5);
+}
+.scenario__delta--signal { color: var(--color-motriz); }
+.scenario__desc { font-size: .92rem; font-weight: 300; line-height: 1.55; opacity: .62; max-width: 38ch; }
+.scenario-list__caption {
+  margin-top: 1.5rem;
+  font-family: var(--font-mono);
+  font-size: .72rem;
+  letter-spacing: .02em;
+  opacity: .45;
+}
+
+@media (min-width: 860px) {
+  .agencia-grid { flex-direction: row; align-items: center; gap: clamp(3rem, 6vw, 5rem); }
+  .agencia-text, .scenario-list { flex: 1; min-width: 0; }
+}
+
+/* ---- Mobile — cada cenário vira um momento editorial vertical, não uma
+   linha de tabela: nome pequeno em mono, descrição, e o percentual como
+   protagonista visual (44–64px). `display:contents` no head promove nome e
+   delta a irmãos diretos de .scenario__desc dentro do mesmo flex column —
+   sem duplicar marcação só para reordenar. ---- */
+@media (max-width: 640px) {
+  .scenario { display: flex; flex-direction: column; padding: clamp(2.25rem, 9vw, 3rem) 0; }
+  .scenario:first-child { padding-top: 0; }
+  .scenario:last-of-type { padding-bottom: clamp(2.25rem, 9vw, 3rem); }
+
+  .scenario__head { display: contents; }
+  .scenario__name { order: 1; margin-bottom: .6rem; }
+  .scenario__desc { order: 2; margin-bottom: 1.5rem; max-width: none; }
+  .scenario__delta {
+    order: 3;
+    align-self: flex-start;
+    font-size: clamp(2.75rem, 14vw, 4rem);
+    line-height: 1;
+    letter-spacing: -.01em;
+  }
+  .scenario__delta span[aria-hidden] { display: inline-block; font-size: .5em; margin-right: .1em; }
+
+  /* nota legal — presença reduzida, logo após o último cenário, sem competir
+     com o fechamento que vem a seguir. */
+  .scenario-list__caption { margin-top: .75rem; font-size: .66rem; opacity: .38; }
+
+  /* assinatura — conclusão conceitual da seção, não rodapé: respiro maior e
+     mais peso do que a versão desktop. */
+  .signature--closing {
+    margin-top: clamp(3.5rem, 13vw, 5rem);
+    padding-top: clamp(2rem, 7vw, 2.75rem);
+    font-size: clamp(1.65rem, 8vw, 2rem);
+  }
+}
+
+.lede {
+  font-size: clamp(1.05rem, 1.7vw, 1.35rem);
+  font-weight: 300;
+  line-height: 1.55;
+  max-width: 54ch;
+  color: rgba(237, 237, 237, .82);
+  margin-bottom: 2.25rem;
+}
+.stage--dado .lede, .stage--dado .body-text { color: rgba(26, 26, 26, .78); }
+
+.body-text {
+  font-size: clamp(1rem, 1.3vw, 1.15rem);
+  font-weight: 300;
+  line-height: 1.6;
+  max-width: 46ch;
+  margin-bottom: 1.25rem;
+  color: rgba(237, 237, 237, .82);
+}
+.stage--dado .body-text, .stage--silencio .body-text { color: rgba(26, 26, 26, .78); }
+
+.signature { margin-top: 2rem; font-style: italic; font-weight: 300; font-size: 1.2rem; }
+
+.caption {
+  margin-top: 1.75rem;
+  font-family: var(--font-mono);
+  font-size: .78rem;
+  font-style: normal;
+  letter-spacing: .02em;
+  color: rgba(26, 26, 26, .65);
+  max-width: 46ch;
+}
+.caption--on-field { color: rgba(237, 237, 237, .6); }
+
+/* palavras fragmentadas para kinetic type (ver main.ts) — mesmo texto, só spans */
+.split-word { display: inline-block; will-change: transform, opacity; }
+
+/* ==========================================================================
+   Botões
+   ========================================================================== */
+
+.button {
+  display: inline-block;
+  margin-top: .5rem;
+  padding: 1rem 1.9rem;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 1rem;
+  background: var(--color-motriz);
+  color: var(--color-campo-aberto);
+  transition: transform var(--motion-quick) var(--ease-field), box-shadow var(--motion-quick) var(--ease-field), background-color var(--motion-quick) var(--ease-field);
+}
+@media (hover: hover) {
+  .button:hover { transform: translateY(-2px); box-shadow: 0 16px 32px -16px rgba(238, 38, 41, .5); }
+}
+.stage--dado .button, .stage--silencio .button { background: var(--color-solo-black); }
+@media (hover: hover) {
+  .stage--dado .button:hover, .stage--silencio .button:hover { box-shadow: 0 16px 32px -16px rgba(26, 26, 26, .4); }
+}
+
+/* CTA secundário — sempre numa linha própria, abaixo do botão primário (nunca ao
+   lado: lado a lado os dois liam como opções concorrentes de mesmo peso). Clicável
+   com clareza própria (borda + seta que avança no hover), mas bem mais discreto —
+   fonte menor, sem preenchimento — para nunca competir pela primeira leitura. */
+.cta-secondary-line {
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  gap: .5em;
+  margin-top: 1.75rem;
+  padding-bottom: .2rem;
+  font-size: .88rem;
+  font-weight: 500;
+  color: rgba(237, 237, 237, .68);
+  border-bottom: 1px solid rgba(237, 237, 237, .28);
+  transition: color var(--motion-quick) var(--ease-field), border-color var(--motion-quick) var(--ease-field);
+}
+.cta-secondary-line::after { content: "→"; transition: transform var(--motion-quick) var(--ease-field); }
+@media (hover: hover) {
+  .cta-secondary-line:hover { color: var(--color-campo-aberto); border-color: var(--color-motriz); }
+  .cta-secondary-line:hover::after { transform: translateX(3px); }
+}
+
+/* ==========================================================================
+   Transformação — pilares ligados ao campo (não cards isolados)
+   ========================================================================== */
+
+/* Lista editorial, não cards de SaaS: 01/02/03 funcionam como marcadores de
+   sistema (mesma voz mono do resto do site) sobre linhas finas, sem fundo,
+   sem borda fechada, sem sombra — o respiro entre as linhas é que carrega a
+   hierarquia. Em telas largas vira uma grade de 3 colunas (índice · título ·
+   descrição), lida como o índice de um relatório, não como um bloco de feature. */
+.pillar-list {
+  display: flex;
+  flex-direction: column;
+  margin-top: clamp(3rem, 6vw, 4.5rem);
+}
+.pillar-list__item {
+  padding: clamp(1.85rem, 4vw, 2.5rem) 0;
+  border-top: var(--border-hairline);
+}
+.pillar-list__item:last-child { border-bottom: var(--border-hairline); }
+.pillar-list__index {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: .78rem; font-weight: 500; letter-spacing: .12em;
+  color: var(--color-motriz);
+  margin-bottom: .9rem;
+}
+.pillar-list__name { font-size: clamp(1.4rem, 2.4vw, 1.85rem); font-weight: 300; margin-bottom: .6rem; }
+.pillar-list__desc { font-size: 1rem; font-weight: 300; max-width: 42ch; line-height: 1.6; opacity: .66; }
+
+@media (min-width: 860px) {
+  .pillar-list__item {
+    display: grid;
+    grid-template-columns: 4.5rem 1fr 1.4fr;
+    column-gap: clamp(1.5rem, 3vw, 3rem);
+    align-items: baseline;
+  }
+  .pillar-list__index { margin-bottom: 0; }
+  .pillar-list__name { margin-bottom: 0; }
+}
+
+/* ==========================================================================
+   Demonstração Visual — grid 2×2 de dataviz proprietário, vivo em loop contínuo
+   ========================================================================== */
+
+.demo-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+  perspective: 1400px;
+}
+@media (min-width: 960px) {
+  .demo-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* "pulso de dados" conectando os 4 cards — trafega pelas frestas do grid, nunca
+   sobre o conteúdo; só existe onde o grid é 2×2 (abaixo de 960px cada card já é
+   vizinho vertical do seguinte, a conexão fica implícita na própria pilha). */
+.demo-flow { position: absolute; pointer-events: none; z-index: 2; display: none; }
+@media (min-width: 960px) {
+  .demo-flow { display: block; }
+  .demo-flow--h { top: 50%; left: 0; right: 0; height: 2px; }
+  .demo-flow--v { left: 50%; top: 0; bottom: 0; width: 2px; }
+}
+.demo-flow__comet {
+  position: absolute;
+  border-radius: 2px;
+  filter: blur(.5px);
+  opacity: 0;
+}
+.demo-flow--h .demo-flow__comet {
+  top: 0; left: -8%; width: 7%; height: 2px;
+  background: linear-gradient(90deg, transparent, #EE2629 35%, #A63BD1 65%, transparent);
+}
+.demo-flow--v .demo-flow__comet {
+  left: 0; top: -8%; width: 2px; height: 7%;
+  background: linear-gradient(180deg, transparent, #A63BD1 35%, #4A5FEA 65%, transparent);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .demo-flow--h .demo-flow__comet { animation: demo-comet-h 14s linear infinite; animation-play-state: paused; }
+  .demo-flow--v .demo-flow__comet { animation: demo-comet-v 19s linear infinite; animation-play-state: paused; }
+  #demonstracao.is-ambient-active .demo-flow__comet { animation-play-state: running; }
+}
+@keyframes demo-comet-h { 0% { left: -8%; opacity: 0; } 10% { opacity: .9; } 90% { opacity: .9; } 100% { left: 101%; opacity: 0; } }
+@keyframes demo-comet-v { 0% { top: -8%; opacity: 0; } 10% { opacity: .9; } 90% { opacity: .9; } 100% { top: 101%; opacity: 0; } }
+
+/* Cada card é uma VITRINE (uma capacidade, um foco visual) — não um mini-dashboard.
+   Hierarquia estritamente vertical: rótulo → headline → texto curto → MUITO espaço
+   → interface. O `margin-top:auto` na interface é o mecanismo do respiro: ele puxa
+   tudo que vem depois para baixo, abrindo o vão que a referência usa como assinatura. */
+.demo-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: rgba(255, 255, 255, .035);
+  border: var(--border-hairline);
+  border-radius: var(--radius-lg);
+  padding: clamp(2.25rem, 4vw, 3.5rem) clamp(1.75rem, 4vw, 3rem) clamp(2.5rem, 4vw, 3.25rem);
+  min-height: clamp(520px, 58vh, 720px);
+}
+.demo-card__eyebrow {
+  display: flex; align-items: center; gap: .6rem;
+  font-family: var(--font-mono); font-size: .74rem; letter-spacing: .14em; text-transform: uppercase;
+  color: rgba(237, 237, 237, .6);
+  margin-bottom: 1.5rem;
+}
+.demo-card__eyebrow-index { color: var(--color-motriz); font-weight: 700; }
+.demo-card__headline { font-size: clamp(1.3rem, 2.1vw, 1.65rem); font-weight: 300; line-height: 1.25; max-width: 26ch; margin-bottom: .85rem; color: var(--color-campo-aberto); }
+.demo-card__body { font-size: .95rem; font-weight: 300; opacity: .68; max-width: 32ch; line-height: 1.55; }
+.demo-card__note { font-size: .8rem; opacity: .55; max-width: 34ch; margin-top: 1.5rem; }
+
+.demo-card__figure {
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum" 0;
+  font-weight: 600;
+  letter-spacing: -.02em;
+  line-height: 1;
+  color: var(--color-campo-aberto);
+}
+.demo-card__figure--inline { font-size: 1.3em; color: var(--color-motriz); }
+.demo-card__figure--hero {
+  font-size: clamp(2.5rem, 4.4vw, 3.4rem);
+  margin-bottom: 2rem;
+  background: linear-gradient(90deg, #EE2629, #A63BD1 55%, #4A5FEA);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.demo-card__readout { margin-bottom: 1rem; }
+.demo-card__readout .demo-card__figure { font-size: clamp(1.9rem, 3.2vw, 2.4rem); margin: .5rem 0 .35rem; }
+.demo-card__interface-label { font-family: var(--font-mono); font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; opacity: .5; margin-bottom: .6rem; text-align: left; }
+
+/* a "interface interna" — o objeto isolado que materializa o dado dentro do card
+   conceitual. Nasce depois de todo o respiro (margin-top:auto) e nunca encosta
+   nas bordas do card externo. */
+.demo-card__interface {
+  margin-top: auto;
+  width: 100%;
+  max-width: 340px;
+  background: rgba(255, 255, 255, .04);
+  border: var(--border-hairline);
+  border-radius: var(--radius-md);
+  padding: clamp(1.25rem, 2.5vw, 1.75rem);
+}
+.demo-card__interface--center { display: flex; justify-content: center; }
+.demo-card__interface--wide { max-width: 420px; }
+
+/* ---- 01 Identifica — line/area ---- */
+.demo-chart { width: 100%; overflow: visible; display: block; }
+.demo-chart__grid { stroke: rgba(237, 237, 237, .08); stroke-width: 1; }
+.demo-chart__line { stroke: var(--color-motriz); stroke-width: 2.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.demo-chart__dots circle { fill: var(--color-solo-navy); stroke: var(--color-motriz); stroke-width: 2; }
+.demo-chart__dot--active { fill: var(--color-motriz); stroke: rgba(237, 237, 237, .5); transform-box: fill-box; transform-origin: center; }
+.demo-chart__traveler { fill: #fff; opacity: 0; filter: drop-shadow(0 0 4px #EE2629); }
+.demo-chart__axis { font-family: var(--font-mono); font-size: 7px; fill: rgba(237, 237, 237, .4); text-anchor: middle; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .demo-chart__area { animation: demo-breathe 7s ease-in-out infinite; animation-play-state: paused; }
+  .demo-chart__dot--active { animation: demo-pulse 3.2s ease-in-out infinite; animation-play-state: paused; }
+  .demo-chart__traveler {
+    offset-path: path("M10,95 C37,95 37,70 64,70 C91,70 91,78 118,78 C145,78 145,50 172,50 C199,50 199,58 226,58 C248,58 248,14 270,14");
+    animation: demo-travel 9s linear infinite;
+    animation-play-state: paused;
+  }
+  #demonstracao.is-ambient-active .demo-chart__area,
+  #demonstracao.is-ambient-active .demo-chart__dot--active,
+  #demonstracao.is-ambient-active .demo-chart__traveler { animation-play-state: running; }
+}
+@keyframes demo-breathe { 0%, 100% { opacity: .85; } 50% { opacity: 1; } }
+@keyframes demo-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.35); } }
+@keyframes demo-travel { 0% { offset-distance: 0%; opacity: 0; } 6% { opacity: 1; } 94% { opacity: 1; } 100% { offset-distance: 100%; opacity: 0; } }
+
+/* ---- 02 Contextualiza — benchmark vertical ---- */
+.demo-chart--bench { width: auto; height: 240px; max-width: 120px; margin-inline: auto; }
+.demo-bench__track { fill: rgba(237, 237, 237, .07); stroke: rgba(237, 237, 237, .15); stroke-width: 1; }
+.demo-bench__cap { fill: rgba(237, 237, 237, .85); }
+.demo-bench__ticks line { stroke: rgba(237, 237, 237, .35); stroke-width: 1; }
+.demo-bench__ticks text { font-family: var(--font-mono); font-size: 9px; fill: rgba(237, 237, 237, .5); }
+.demo-bench__tick--ref { stroke: var(--color-campo-aberto); stroke-width: 1.6; }
+.demo-bench__tick-label--ref { fill: var(--color-campo-aberto); font-weight: 700; }
+.demo-bench__marker { fill: var(--color-campo-aberto); }
+.demo-bench__particle { fill: rgba(237, 237, 237, .6); transform-box: fill-box; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .demo-bench__cap { animation: demo-breathe 6s ease-in-out infinite; animation-play-state: paused; }
+  .demo-bench__particle { animation: demo-rise 5.5s ease-in infinite; animation-play-state: paused; }
+  .demo-bench__particle[data-bench-particle="1"] { animation-delay: 2.4s; animation-duration: 6.8s; }
+  #demonstracao.is-ambient-active .demo-bench__cap,
+  #demonstracao.is-ambient-active .demo-bench__particle { animation-play-state: running; }
+}
+@keyframes demo-rise { 0% { transform: translateY(0); opacity: 0; } 15% { opacity: .8; } 90% { opacity: 0; } 100% { transform: translateY(-56px); opacity: 0; } }
+
+/* ---- 03 Compara — barras + delta agrupadas em um único módulo ---- */
+.demo-compare { position: relative; display: flex; flex-direction: column; gap: 1.35rem; }
+.demo-compare__value { font-family: var(--font-mono); font-feature-settings: "tnum" 0; font-size: clamp(1.1rem, 1.8vw, 1.3rem); font-weight: 600; margin-bottom: .5rem; color: var(--color-campo-aberto); }
+.demo-compare__track { height: 14px; border-radius: 999px; background: rgba(237, 237, 237, .08); overflow: hidden; }
+.demo-compare__fill { height: 100%; border-radius: 999px; }
+.demo-compare__fill--ref { background: linear-gradient(90deg, var(--color-motriz), #A63BD1); }
+.demo-compare__fill--op { background: linear-gradient(90deg, #A63BD1, #4A5FEA); }
+.demo-scan {
+  position: absolute; top: -6px; bottom: -6px; left: 0; width: 3px;
+  background: linear-gradient(180deg, transparent, rgba(255, 255, 255, .6), transparent);
+  filter: blur(1px);
+  border-radius: 2px;
+  opacity: 0;
+}
+.demo-delta { border-top: 1px solid rgba(237, 237, 237, .12); padding-top: 1.1rem; margin-top: .25rem; }
+.demo-delta__pct { font-family: var(--font-mono); font-size: .9rem; font-weight: 600; color: var(--color-motriz); }
+.demo-delta__pct span[data-count-to] { font-variant-numeric: tabular-nums; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .demo-scan { animation: demo-scan-sweep 10s ease-in-out infinite; animation-play-state: paused; }
+  #demonstracao.is-ambient-active .demo-scan { animation-play-state: running; }
+}
+@keyframes demo-scan-sweep { 0%, 100% { left: 0%; opacity: 0; } 8% { opacity: .9; } 50% { left: calc(100% - 3px); opacity: .9; } 92% { opacity: 0; } }
+
+/* ---- 04 Revela — impact ring, isolado, sem nada atravessando seus limites ----
+   O valor grande (R$ 40.570) fica ACIMA do anel — dentro dele só cabe o que é
+   curto o bastante para nunca colidir com o traço: "21%" + uma legenda de uma
+   linha. Nenhum texto compartilha o mesmo espaço que o arco desenha. */
+.demo-ring { position: relative; width: clamp(200px, 22vw, 260px); margin-inline: auto; }
+.demo-ring svg { display: block; width: 100%; height: auto; overflow: visible; }
+.demo-ring__glow { fill: rgba(166, 59, 209, .12); filter: blur(22px); }
+.demo-ring__track { fill: none; stroke: rgba(237, 237, 237, .1); stroke-width: 10; }
+.demo-ring__fill { fill: none; stroke-width: 10; stroke-linecap: round; }
+.demo-ring__segment circle { fill: none; stroke: rgba(237, 237, 237, .9); stroke-width: 10; stroke-linecap: round; stroke-dasharray: 60 430; opacity: .5; }
+.demo-ring__orbit circle { fill: var(--color-campo-aberto); }
+.demo-ring__orbit--1 circle { opacity: .7; }
+.demo-ring__orbit--2 circle { opacity: .4; }
+.demo-ring__readout { position: absolute; inset: 18%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.demo-ring__pct { font-family: var(--font-mono); font-feature-settings: "tnum" 0; font-size: clamp(1.6rem, 3vw, 2.1rem); font-weight: 700; color: var(--color-campo-aberto); line-height: 1; }
+.demo-ring__pct span[aria-hidden] { color: var(--color-motriz); font-size: .75em; }
+.demo-ring__caption { font-family: var(--font-mono); font-size: .62rem; letter-spacing: .04em; opacity: .55; margin-top: .4rem; max-width: 12ch; line-height: 1.3; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .demo-ring__spin, .demo-ring__segment, .demo-ring__orbit { animation-play-state: paused; transform-origin: 100px 100px; }
+  .demo-ring__spin { animation: demo-spin 22s linear infinite; }
+  .demo-ring__segment { animation: demo-spin-rev 13s linear infinite; }
+  .demo-ring__orbit--1 { animation: demo-spin 18s linear infinite; }
+  .demo-ring__orbit--2 { animation: demo-spin-rev 24s linear infinite; }
+  .demo-ring__glow { animation: demo-glow-pulse 9s ease-in-out infinite; animation-play-state: paused; }
+  #demonstracao.is-ambient-active .demo-ring__spin,
+  #demonstracao.is-ambient-active .demo-ring__segment,
+  #demonstracao.is-ambient-active .demo-ring__orbit,
+  #demonstracao.is-ambient-active .demo-ring__glow { animation-play-state: running; }
+}
+@keyframes demo-spin { to { transform: rotate(360deg); } }
+@keyframes demo-spin-rev { to { transform: rotate(-360deg); } }
+@keyframes demo-glow-pulse { 0%, 100% { opacity: .7; } 50% { opacity: 1; } }
+
+@media (max-width: 640px) {
+  .demo-card { min-height: 0; padding: 2.25rem 1.5rem 2.5rem; }
+  .demo-card__interface, .demo-card__interface--wide { max-width: 100%; }
+}
+
+/* hover — desktop apenas; nunca essencial para entender o conteúdo (mobile não tem hover) */
+@media (hover: hover) {
+  .demo-chart__dots circle { transition: r .2s var(--ease-field); cursor: default; }
+  .demo-chart__dots circle:hover { r: 5; }
+  .demo-bench__marker { transition: transform .2s var(--ease-field); }
+  .demo-card:has(.demo-chart--bench):hover .demo-bench__marker { transform: scale(1.4); }
+  .demo-compare__fill { transition: filter .2s var(--ease-field); }
+  .demo-compare__track:hover .demo-compare__fill { filter: brightness(1.25); }
+  .demo-ring:hover .demo-ring__glow { opacity: 1; }
+  .demo-ring:hover .demo-ring__fill { filter: brightness(1.15); }
+}
+
+/* ---- Tilt cards — cards da demonstração que reagem ao cursor ----
+   O movimento vem inteiramente de src/motion/tilt-card.ts (rotationX/rotationY
+   via GSAP, respeitando prefers-reduced-motion e hover:hover). Aqui só ficam os
+   efeitos que independem de JS: leve elevação/brilho no hover e o "reflexo" que
+   segue o cursor via --spot-x/--spot-y (fallback 50% = centro, sem qualquer
+   posição custom, quando JS não roda). */
+[data-tilt-card] { position: relative; }
+@media (hover: hover) {
+  [data-tilt-card] {
+    will-change: transform;
+    transition: box-shadow .45s var(--ease-field), border-color .45s var(--ease-field);
+  }
+  [data-tilt-card]:hover {
+    border-color: rgba(237, 237, 237, .16);
+    box-shadow: 0 22px 44px -26px rgba(0, 5, 65, .6), 0 8px 18px -14px rgba(238, 38, 41, .16);
+  }
+  [data-tilt-card]::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(360px circle at var(--spot-x, 50%) var(--spot-y, 50%), rgba(237, 237, 237, .06), transparent 62%);
+    opacity: 0;
+    transition: opacity .45s var(--ease-field);
+    pointer-events: none;
+  }
+  [data-tilt-card]:hover::after { opacity: 1; }
+}
+
+/* ==========================================================================
+   Jornada — fluxo editorial, não uma timeline desenhada. Os 6 passos correm
+   como uma frase, ligados por setas tipográficas discretas (sem linha, sem
+   pontos, sem pills). Um único passo por vez acende em branco pleno conforme
+   o scroll atravessa a seção — um foco que viaja, não um preenchimento que
+   acumula — para ler como sistema vivo, não como progress bar (ver
+   src/motion/journey.ts). A seta logo depois do passo aceso ganha presença
+   junto, apontando para onde o foco vai em seguida. "Nova leitura" carrega o
+   glifo de retorno (↺); ao acender, o glifo gira e o primeiro passo pisca de
+   leve — o suficiente para ler "isso fecha o ciclo" sem uma segunda linha
+   desenhada de volta ao início. Em telas largas os 6 passos cabem numa única
+   linha (container alargado, --stage__inner--wide); abaixo do breakpoint a
+   linha quebra normalmente, sem nenhum tratamento especial. */
+
+.journey {
+  margin: clamp(2rem, 4vw, 2.75rem) 0 clamp(1.75rem, 3.5vw, 2.5rem);
+}
+
+.journey__steps {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  row-gap: clamp(1.1rem, 2.5vw, 1.5rem);
+}
+@media (min-width: 1100px) {
+  .journey__steps { flex-wrap: nowrap; }
+}
+
+.journey__step {
+  display: inline-flex;
+  align-items: baseline;
+  gap: .55em;
+  flex: none;
+  opacity: .32;
+  transform: translateY(4px);
+  transition: opacity .7s var(--ease-field), transform .7s var(--ease-field);
+}
+.journey__step.is-active { opacity: 1; transform: translateY(0); }
+
+.journey__step:not(:last-child)::after {
+  content: "→";
+  margin: 0 clamp(.65rem, 1.5vw, 1.35rem);
+  font-weight: 300;
+  opacity: .22;
+  transition: opacity var(--motion-base) var(--ease-field);
+}
+.journey__step.is-active:not(:last-child)::after { opacity: .65; }
+
+.journey__index { font-family: var(--font-mono); font-size: .64rem; letter-spacing: .08em; opacity: .5; }
+.journey__label { font-family: var(--font-mono); font-size: .82rem; font-weight: 500; letter-spacing: .03em; text-transform: uppercase; white-space: nowrap; }
+.journey__desc, .journey__rail { display: none; }
+
+.journey__step--return .journey__label { transition: color var(--motion-base) var(--ease-field); }
+.journey__step--return.is-active .journey__label { color: var(--color-motriz); }
+.journey__return-icon {
+  display: inline-block;
+  opacity: .55;
+  transition: opacity var(--motion-base) var(--ease-field), color var(--motion-base) var(--ease-field);
+}
+.journey__step--return.is-active .journey__return-icon { opacity: 1; color: var(--color-motriz); }
+
+/* legenda — uma única linha abaixo da régua de passos, cujo texto troca com o
+   passo em foco (ver journey.ts). Altura mínima reservada para o texto nunca
+   empurrar o parágrafo seguinte quando ele entra/sai. */
+.journey__caption {
+  margin-top: clamp(1rem, 2.5vw, 1.5rem);
+  min-height: 1.3em;
+  font-family: var(--font-mono);
+  font-size: .8rem;
+  font-weight: 300;
+  letter-spacing: .01em;
+  color: rgba(237, 237, 237, .55);
+  opacity: 0;
+  transition: opacity .5s var(--ease-field);
+}
+.journey__caption.is-visible { opacity: 1; }
+
+.journey.is-looping .journey__return-icon { animation: journey-return-spin .9s var(--ease-field); }
+.journey.is-looping .journey__steps .journey__step:first-child .journey__index,
+.journey.is-looping .journey__steps .journey__step:first-child .journey__label {
+  animation: journey-echo 1.1s var(--ease-field);
+}
+
+@keyframes journey-return-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); }
+}
+@keyframes journey-echo {
+  0%, 100% { opacity: 1; }
+  40% { opacity: .3; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .journey__step { transition: none; opacity: 1; transform: none; }
+  .journey__caption { transition: none; opacity: 1; }
+  .journey.is-looping .journey__return-icon,
+  .journey.is-looping .journey__steps .journey__step:first-child .journey__index,
+  .journey.is-looping .journey__steps .journey__step:first-child .journey__label {
+    animation: none;
+  }
+}
+
+/* ---- Mobile — jornada vertical editorial, não a régua horizontal comprimida
+   em duas colunas. Um trilho fino conecta os 6 passos; a etapa mais próxima
+   do centro da viewport acende (via IntersectionObserver com faixa de
+   interseção no centro — ver journey.ts), as demais ficam em baixa opacidade.
+   Cada passo carrega sua própria microdescrição (a legenda compartilhada do
+   desktop não existe aqui: nada troca de texto, cada etapa já mostra a sua).
+   A seção deixa de forçar 100vh: a altura é a do próprio conteúdo, só com um
+   respiro fixo antes da próxima seção. ---- */
+@media (max-width: 640px) {
+  #jornada.stage { min-height: 0; padding-top: clamp(4.5rem, 15vw, 6rem); padding-bottom: clamp(6rem, 20vw, 7.5rem); }
+
+  .journey { position: relative; padding-left: 1.75rem; }
+  .journey__caption { display: none; }
+
+  .journey__rail {
+    display: block;
+    position: absolute;
+    left: 0; top: .3em; bottom: .3em;
+    width: 1px;
+    background: rgba(237, 237, 237, .16);
+  }
+  .journey__rail-fill {
+    position: absolute;
+    inset: 0;
+    width: 100%; height: 100%;
+    transform: scaleY(0);
+    transform-origin: top;
+    background: linear-gradient(180deg, var(--color-motriz), #A63BD1 55%, #4A5FEA);
+  }
+
+  .journey__steps {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    row-gap: clamp(2rem, 9vw, 2.75rem);
+  }
+
+  .journey__step {
+    display: block;
+    position: relative;
+    padding-left: 0;
+  }
+  .journey__step::before {
+    content: "";
+    position: absolute;
+    left: -1.75rem; top: .35em;
+    width: 7px; height: 7px;
+    margin-left: -3px;
+    border-radius: 50%;
+    background: rgba(237, 237, 237, .3);
+    transition: background .6s var(--ease-field), box-shadow .6s var(--ease-field);
+  }
+  .journey__step.is-active::before { background: var(--color-motriz); box-shadow: 0 0 0 3px rgba(238, 38, 41, .16); }
+  .journey__step:not(:last-child)::after { display: none; }
+
+  .journey__index { display: block; margin-bottom: .3rem; }
+  .journey__label { display: block; font-size: 1.05rem; font-weight: 600; letter-spacing: normal; text-transform: none; white-space: normal; }
+  .journey__desc {
+    display: block;
+    margin-top: .35rem;
+    font-family: var(--font-mono);
+    font-size: .78rem;
+    font-weight: 300;
+    color: rgba(237, 237, 237, .6);
+  }
+  .journey__return-icon { margin-left: .5em; }
+}
+
+@media (max-width: 640px) and (prefers-reduced-motion: reduce) {
+  .journey__step::before { transition: none; }
+}
+
+/* ==========================================================================
+   Prova
+   ========================================================================== */
+
+.pending-note {
+  margin-top: 2rem;
+  padding: 1.25rem 1.5rem;
+  border: 1px dashed rgba(26, 26, 26, .3);
+  border-radius: var(--radius-sm);
+  max-width: 52ch;
+}
+.pending-note__text { font-size: .95rem; color: rgba(26, 26, 26, .65); margin: 0; }
+
+/* painel de indicadores em preparação — substitui a fotografia corporativa por
+   uma composição orientada a dados. "[X]" fica deliberadamente com contraste
+   baixo e sublinhado tracejado: lê-se como rascunho, não como número final.
+   Quando os indicadores forem validados, os placeholders viram os números
+   reais e o tracejado sai — o layout já nasce pronto para isso. */
+.prova-stats { display: flex; flex-direction: column; }
+.prova-stat { padding-top: 1.6rem; border-top: var(--border-hairline-ink); }
+.prova-stat:first-child { border-top: none; padding-top: 0; }
+.prova-stat + .prova-stat { margin-top: 1.6rem; }
+.prova-stat__figure {
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum" 0;
+  font-size: clamp(2rem, 3.6vw, 2.75rem);
+  font-weight: 600;
+  letter-spacing: -.01em;
+  color: rgba(26, 26, 26, .4);
+  text-decoration: underline dashed rgba(26, 26, 26, .32);
+  text-underline-offset: 8px;
+  margin-bottom: .4rem;
+}
+.prova-stat__label { font-family: var(--font-mono); font-size: .78rem; letter-spacing: .06em; text-transform: uppercase; color: rgba(26, 26, 26, .6); }
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+
+/* fechamento de marca, não área de navegação: a mesma contenção editorial do
+   resto do site (mono pequeno, hairlines, muito respiro), terminando a
+   página no mesmo tom com que ela começou — "a escolha é sua" ecoa a
+   assinatura do hero. */
+.site-footer {
+  position: relative; z-index: 1;
+  background: var(--color-solo-black);
+  color: var(--color-campo-aberto);
+  padding: 4.25rem var(--edge) 3rem;
+  display: flex;
+  flex-direction: column;
+}
+
+/* mobile — fechamento silencioso: o logo é o único elemento com peso visual
+   real, tudo o resto (tagline, navegação, assinatura/legal) fica deliberadamente
+   pequeno e contido, sem competir por atenção depois do CTA final. */
+.site-footer__brand { display: flex; flex-direction: column; gap: .85rem; margin-bottom: clamp(1.75rem, 6vw, 2.25rem); }
+.site-footer__logo { width: clamp(90px, 22vw, 110px); height: auto; }
+.site-footer__tagline {
+  font-size: clamp(1rem, 4vw, 1.125rem);
+  font-weight: 300;
+  line-height: 1.45;
+  max-width: 280px;
+  color: rgba(237, 237, 237, .58);
+}
+
+.site-footer__nav { display: flex; flex-direction: column; border-top: 1px solid rgba(237, 237, 237, .06); }
+.site-footer__link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .85rem 0;
+  border-bottom: 1px solid rgba(237, 237, 237, .06);
+  font-size: .95rem;
+  font-weight: 500;
+  color: rgba(237, 237, 237, .72);
+  transition: color var(--motion-quick) var(--ease-field);
+}
+.site-footer__arrow {
+  font-size: .8em;
+  opacity: .3;
+  transition: opacity var(--motion-quick) var(--ease-field), transform var(--motion-quick) var(--ease-field);
+}
+@media (hover: hover) {
+  .site-footer__link:hover { color: var(--color-campo-aberto); }
+  .site-footer__link:hover .site-footer__arrow { opacity: .7; transform: translate(2px, -2px); }
+}
+
+.site-footer__closing { margin-top: clamp(1.5rem, 5vw, 2rem); }
+.site-footer__signature { font-style: italic; font-weight: 300; font-size: 1.1rem; color: rgba(237, 237, 237, .78); margin-bottom: .5rem; }
+.site-footer__legal { font-family: var(--font-mono); font-size: .7rem; letter-spacing: .04em; color: rgba(237, 237, 237, .34); }
+
+@media (min-width: 860px) {
+  .site-footer {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: clamp(4.5rem, 8vw, 5.5rem) var(--edge) clamp(3rem, 6vw, 4rem);
+    gap: clamp(2.5rem, 6vw, 5rem);
+  }
+  .site-footer__brand { flex: 1; min-width: 0; gap: 1.15rem; margin-bottom: 0; }
+  .site-footer__logo { width: clamp(72px, 7vw, 88px); }
+  .site-footer__tagline { font-size: 1rem; line-height: 1.5; max-width: 30ch; color: rgba(237, 237, 237, .68); }
+
+  .site-footer__nav { flex: none; flex-direction: row; gap: clamp(2rem, 3.5vw, 2.75rem); border-top: none; }
+  .site-footer__link { padding: 0; border-bottom: none; gap: .4em; font-size: 1rem; color: rgba(237, 237, 237, .85); }
+  .site-footer__arrow { font-size: 1em; opacity: .5; }
+  @media (hover: hover) {
+    .site-footer__link:hover .site-footer__arrow { opacity: 1; }
+  }
+
+  .site-footer__closing { flex: none; margin-top: 0; text-align: right; }
+  .site-footer__signature { font-size: 1.05rem; color: rgba(237, 237, 237, .85); margin-bottom: .75rem; }
+  .site-footer__legal { font-size: .72rem; color: rgba(237, 237, 237, .38); }
+}
+
+/* ==========================================================================
+   Motion — só ativa com JS; fallback total sem ele
+   ========================================================================== */
+
+@media (prefers-reduced-motion: no-preference) {
+  html.js [data-reveal] {
+    opacity: 0; transform: translateY(18px);
+    transition: opacity .6s var(--ease-field), transform .6s var(--ease-field);
+  }
+  html.js [data-reveal].is-visible { opacity: 1; transform: none; }
+
+  html.js .split-word { opacity: 0; transform: translateY(100%); }
+  html.js [data-split].is-split .split-word { opacity: 1; transform: none; }
+}
+
+/* ==========================================================================
+   Responsivo
+   ========================================================================== */
+
+@media (max-width: 640px) {
+  .site-nav__link:not(.site-nav__link--cta) { display: none; }
+}
