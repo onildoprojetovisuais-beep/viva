@@ -6,6 +6,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 if (import.meta.env.DEV) {
   (window as any).__viva_ScrollTrigger = ScrollTrigger;
+  (window as any).__viva_gsap = gsap;
 }
 
 /** Envolve cada palavra em um span, preservando o texto original (só fragmentação visual). */
@@ -71,17 +72,27 @@ export function setupMotion(field: Field | null, reduced: boolean) {
   });
 
   splitEls.forEach((el, i) => {
+    const words = splitWordsByEl[i];
+    // Estado inicial INLINE: a regra CSS `[data-split].is-split .split-word` deixa
+    // as palavras visíveis assim que o split acontece (vence `.split-word` por
+    // especificidade), o que anulava a entrada. Inline style vence o CSS.
+    // Blur → nítido: "a leitura emergindo" (REF-007/REF-009 da Stack), sem bounce.
+    gsap.set(words, { opacity: 0, yPercent: 70, filter: "blur(8px)" });
+
     // revelação atmosférica e contida — restrição deliberada, não pressa (nunca springs/bounce)
     ScrollTrigger.create({
       trigger: el,
       start: "top 85%",
+      once: true,
       onEnter: () =>
-        gsap.to(splitWordsByEl[i], {
+        gsap.to(words, {
           opacity: 1,
-          y: 0,
+          yPercent: 0,
+          filter: "blur(0px)",
           duration: 1.3,
-          ease: "cubic-bezier(.45,.03,.52,.96)",
+          ease: "sine.inOut", // ≈ --ease-atmosphere (.45,.03,.52,.96); GSAP não lê string cubic-bezier sem CustomEase
           stagger: 0.045,
+          clearProps: "filter",
         }),
     });
   });

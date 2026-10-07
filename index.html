@@ -23,7 +23,7 @@
   </a>
   <nav class="site-nav" aria-label="Navegação principal">
     <a class="site-nav__link" href="#entrar">Entrar</a>
-    <a class="site-nav__link site-nav__link--cta" href="#cta-final">Quero uma demonstração</a>
+    <a class="site-nav__link site-nav__link--cta" href="https://wa.me/5521988967369?text=Ol%C3%A1%2C%20quero%20uma%20demonstra%C3%A7%C3%A3o%20do%20VIVA." target="_blank" rel="noopener">Quero uma demonstração</a>
   </nav>
 </header>
 
@@ -34,7 +34,7 @@
       <p class="eyebrow" data-split>VIVA</p>
       <h1 id="hero-title" class="display" data-split>O dado é técnico. A decisão é financeira.</h1>
       <p class="lede" data-reveal>Sua operação já gera, todo mês, dado técnico de saúde e segurança. O VIVA interpreta esses dados e revela o impacto econômico por trás deles, para que você decida com mais evidência onde investir, o que ampliar e o que revisar.</p>
-      <a class="button button--primary" href="#cta-final" data-reveal>Quero uma demonstração</a>
+      <a class="button button--primary" href="https://wa.me/5521988967369?text=Ol%C3%A1%2C%20quero%20uma%20demonstra%C3%A7%C3%A3o%20do%20VIVA." target="_blank" rel="noopener" data-reveal>Quero uma demonstração</a>
     </div>
   </section>
 
@@ -45,7 +45,7 @@
       </div>
       <div class="stage__media-text">
         <p class="kicker" data-reveal>O ponto de partida</p>
-        <h2 id="problema-title" class="heading" data-split>Você visualiza o dado. Mas conhece o risco de impacto no seu negócio?</h2>
+        <h2 id="problema-title" class="heading" data-split>Você visualiza o dado. Mas conhece o risco do impacto no seu negócio?</h2>
         <p class="body-text" data-reveal>O dado existe. O que falta é a leitura: sem ela, você decide com informação incompleta — e o risco por trás de cada número continua invisível.</p>
       </div>
     </div>
@@ -235,7 +235,7 @@
   <section id="jornada" class="stage stage--loop" data-field-stage="3" aria-labelledby="jornada-title">
     <div class="stage__inner stage__inner--wide">
       <p class="kicker" data-reveal>No tempo</p>
-      <h2 id="jornada-title" class="heading heading--loop" data-split>Sua operação não muda em uma tela. Evolui a cada decisão.</h2>
+      <h2 id="jornada-title" class="heading heading--loop" data-split>Sua operação não muda em um dado. Evolui a cada decisão.</h2>
       <div class="journey" data-journey>
         <div class="journey__rail" aria-hidden="true"><div class="journey__rail-fill" data-journey-rail-fill></div></div>
         <ol class="journey__steps" aria-label="Diagnóstico, Leitura, Insight, Decisão, Acompanhamento, Nova leitura — ciclo contínuo, que retorna a uma nova leitura">
@@ -253,31 +253,24 @@
   </section>
 
   <section id="prova" class="stage stage--silencio" data-field-stage="pause" aria-labelledby="prova-title">
-    <div class="stage__inner stage__inner--media">
-      <div class="stage__media-text">
+    <div class="stage__inner prova">
+      <div class="prova__intro">
         <p class="kicker" data-reveal>Evidência</p>
         <h2 id="prova-title" class="heading" data-reveal>Menos suposição. Mais evidência.</h2>
         <p class="body-text" data-reveal>Anos de método e operação, com resultado validado por clientes ativos.</p>
-
-        <div class="pending-note" data-reveal>
-          <p class="pending-note__text">Os indicadores desta seção (anos de experiência, clientes ativos e resultado por caso) seguem em validação — atualizamos assim que forem autorizados para publicação.</p>
-        </div>
       </div>
-
-      <!-- estrutura pronta para os indicadores reais: quando validados, os números
-           substituem os placeholders "[X]" abaixo e o tratamento tracejado sai. -->
-      <div class="stage__media prova-stats" data-reveal-group role="group" aria-label="Indicadores em preparação, ainda não publicados">
-        <div class="prova-stat" data-reveal>
-          <p class="prova-stat__figure">[X] anos</p>
+      <!-- indicadores como herói visual — contagem, barras e rede animadas em
+           src/motion/prova-stats.ts. O valor final fica sempre no HTML. -->
+      <div class="prova-stats" data-prova-stats data-reveal-group role="group" aria-label="Indicadores">
+        <div class="prova-stat prova-stat--anos" data-reveal>
+          <p class="prova-stat__figure"><span class="prova-stat__num" data-prova-count="anos" data-count-to="8">8</span> <span class="prova-stat__unit">anos</span></p>
+          <div class="prova-stat__viz prova-ticks" data-prova-ticks aria-hidden="true"></div>
           <p class="prova-stat__label">de método e operação</p>
         </div>
-        <div class="prova-stat" data-reveal>
-          <p class="prova-stat__figure">[X]</p>
+        <div class="prova-stat prova-stat--clientes" data-reveal>
+          <p class="prova-stat__figure"><span class="prova-stat__num" data-prova-count="clientes" data-count-to="30">30</span><span class="prova-stat__plus" data-prova-plus>+</span></p>
+          <div class="prova-stat__viz prova-network" data-prova-network aria-hidden="true"></div>
           <p class="prova-stat__label">clientes ativos</p>
-        </div>
-        <div class="prova-stat" data-reveal>
-          <p class="prova-stat__figure">+[X]%</p>
-          <p class="prova-stat__label">resultado por caso acompanhado</p>
         </div>
       </div>
     </div>
@@ -312,7 +305,7 @@
           <div class="scenario" data-reveal>
             <div class="scenario__head">
               <span class="scenario__name">Revisar</span>
-              <span class="scenario__delta scenario__delta--signal"><span aria-hidden="true">↓</span> <span class="scenario__delta-value" data-count-to="8" data-suffix="%">8%</span></span>
+              <span class="scenario__delta scenario__delta--signal"><span aria-hidden="true">↕</span> <span class="scenario__delta-value" data-count-to="8" data-suffix="%">8%</span></span>
             </div>
             <p class="scenario__desc">Corrigir o que consome sem retornar.</p>
           </div>
@@ -328,8 +321,8 @@
     <div class="cta-light" data-cta-light aria-hidden="true"></div>
     <div class="stage__inner stage__inner--cta">
       <h2 id="cta-final-title" class="heading heading--resolucao" data-split>Veja o que seus dados ainda não estão mostrando.</h2>
-      <p class="body-text" data-reveal>Conheça a leitura econômico-financeira da sua operação e enxergue o impacto por trás de cada decisão.</p>
-      <a class="button button--primary" href="#entrar" data-reveal>Quero uma demonstração</a>
+      <p class="body-text" data-reveal>Conheça a leitura econômico-financeira da sua operação em Saúde e Segurança do Trabalho e enxergue o impacto em cada decisão.</p>
+      <a class="button button--primary" href="https://wa.me/5521988967369?text=Ol%C3%A1%2C%20quero%20uma%20demonstra%C3%A7%C3%A3o%20do%20VIVA." target="_blank" rel="noopener" data-reveal>Quero uma demonstração</a>
       <a class="cta-secondary-line" href="#entrar" data-reveal>Já conheceu o VIVA e quer avançar? Quero acesso</a>
     </div>
   </section>
@@ -349,7 +342,7 @@
 
   <nav class="site-footer__nav" aria-label="Navegação do rodapé">
     <a class="site-footer__link" href="#entrar">Entrar<span class="site-footer__arrow" aria-hidden="true">↗</span></a>
-    <a class="site-footer__link" href="#cta-final">Quero uma demonstração<span class="site-footer__arrow" aria-hidden="true">↗</span></a>
+    <a class="site-footer__link" href="https://wa.me/5521988967369?text=Ol%C3%A1%2C%20quero%20uma%20demonstra%C3%A7%C3%A3o%20do%20VIVA." target="_blank" rel="noopener">Quero uma demonstração<span class="site-footer__arrow" aria-hidden="true">↗</span></a>
   </nav>
 
   <div class="site-footer__closing">

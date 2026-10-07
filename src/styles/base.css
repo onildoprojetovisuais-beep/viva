@@ -959,27 +959,195 @@ main#scroll-content { position: relative; z-index: 1; }
 }
 .pending-note__text { font-size: .95rem; color: rgba(26, 26, 26, .65); margin: 0; }
 
-/* painel de indicadores em preparação — substitui a fotografia corporativa por
-   uma composição orientada a dados. "[X]" fica deliberadamente com contraste
-   baixo e sublinhado tracejado: lê-se como rascunho, não como número final.
-   Quando os indicadores forem validados, os placeholders viram os números
-   reais e o tracejado sai — o layout já nasce pronto para isso. */
-.prova-stats { display: flex; flex-direction: column; }
-.prova-stat { padding-top: 1.6rem; border-top: var(--border-hairline-ink); }
-.prova-stat:first-child { border-top: none; padding-top: 0; }
-.prova-stat + .prova-stat { margin-top: 1.6rem; }
-.prova-stat__figure {
-  font-family: var(--font-mono);
-  font-feature-settings: "tnum" 0;
-  font-size: clamp(2rem, 3.6vw, 2.75rem);
-  font-weight: 600;
-  letter-spacing: -.01em;
-  color: rgba(26, 26, 26, .4);
-  text-decoration: underline dashed rgba(26, 26, 26, .32);
-  text-underline-offset: 8px;
-  margin-bottom: .4rem;
+/* indicadores como herói da seção — numerais em escala display nas cores da
+   marca VIVA: Solo Firme (--color-solo-navy) aquecendo até a Motriz
+   (--color-motriz), o mesmo degradê navy → vermelho do campo e do painel do
+   produto. Nenhuma cor solta: tudo sai dos tokens do :root, misturados com
+   color-mix() pela posição --t (0 = navy, 1 = motriz) que o JS informa por
+   elemento. Sobre o fundo claro (--color-campo-aberto). Cada número ganha um
+   gesto gráfico logo abaixo, na mesma altura nas duas colunas: 8 barras em
+   escada (anos acumulados) e uma constelação de 30 nós (clientes ativos).
+   Animação em src/motion/prova-stats.ts; sem JS ou com reduced-motion o
+   estado final é o que aparece. */
+.prova { width: 100%; }
+.prova__intro { max-width: 40rem; margin-bottom: clamp(2.75rem, 7vw, 5rem); }
+.prova__intro .heading { margin-bottom: 1rem; }
+
+.prova-stats {
+  --prova-grad: linear-gradient(105deg, var(--color-solo-navy) 22%, var(--color-motriz) 112%);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(3.25rem, 9vw, 4.5rem);
 }
-.prova-stat__label { font-family: var(--font-mono); font-size: .78rem; letter-spacing: .06em; text-transform: uppercase; color: rgba(26, 26, 26, .6); }
+@media (min-width: 860px) {
+  .prova-stats { grid-template-columns: 1fr 1fr; gap: clamp(3rem, 6vw, 5rem); }
+}
+.prova-tick, .prova-node, .prova-edge {
+  --prova-c: color-mix(in oklab, var(--color-solo-navy), var(--color-motriz) calc(var(--t, 0) * 100%));
+}
+.prova-stat { position: relative; min-width: 0; display: flex; flex-direction: column; }
+.prova-stat + .prova-stat::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: calc(clamp(3.25rem, 9vw, 4.5rem) / -2);
+  border-top: var(--border-hairline-ink);
+}
+@media (min-width: 860px) {
+  .prova-stat + .prova-stat::before {
+    left: calc(clamp(3rem, 6vw, 5rem) / -2); right: auto; top: 6%; bottom: 6%;
+    border-top: none; border-left: var(--border-hairline-ink);
+  }
+}
+
+.prova-stat__figure {
+  display: flex;
+  align-items: baseline;
+  font-family: var(--font-body);
+  font-feature-settings: "tnum" 1;
+  font-size: clamp(8.5rem, 16vw, 14rem);
+  font-weight: 300;
+  line-height: .82;
+  letter-spacing: -.065em;
+  color: var(--color-ink);
+  margin: 0 0 clamp(1.5rem, 3.4vw, 2.5rem) -.055em;
+  white-space: nowrap;
+}
+.prova-stat__num {
+  display: inline-block;
+  background: var(--prova-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  padding: .04em .06em .06em 0;
+  will-change: transform;
+}
+.prova-stat__unit {
+  font-size: .26em;
+  font-weight: 300;
+  letter-spacing: -.02em;
+  margin-left: .1em;
+  color: var(--color-solo-navy);
+}
+.prova-stat__plus {
+  position: relative;
+  display: inline-block;
+  align-self: flex-start;
+  font-size: .56em;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1;
+  color: var(--color-motriz);
+  margin: .02em 0 0 .02em;
+}
+.prova-stat__shock {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 1em; height: 1em;
+  margin: -.5em 0 0 -.5em;
+  border: 2px solid var(--color-motriz);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.prova-stat__viz { width: 100%; aspect-ratio: 600 / 170; margin-bottom: 1.1rem; }
+.prova-stat__label {
+  font-family: var(--font-mono);
+  font-size: .8rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: rgba(26, 26, 26, .66);
+  padding-top: .9rem;
+  border-top: var(--border-hairline-ink);
+}
+
+/* 8 anos — barras em escada (acúmulo), preenchem uma por ano */
+.prova-ticks {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: clamp(5px, 1.1vw, 12px);
+}
+.prova-tick { display: flex; flex-direction: column; justify-content: flex-end; gap: .45rem; min-width: 0; }
+.prova-tick__bar {
+  position: relative;
+  height: var(--tick-h, 100%);
+  border-radius: 3px;
+  background: rgba(26, 26, 26, .07);
+  overflow: hidden;
+}
+.prova-tick__fill {
+  position: absolute; inset: 0;
+  background: var(--prova-c);
+  transform-origin: 50% 100%;
+  transform: scaleY(0);
+  transition: transform .55s var(--ease-field);
+}
+.prova-tick.is-on .prova-tick__fill { transform: scaleY(1); }
+.prova-tick__idx {
+  font-family: var(--font-mono);
+  font-size: clamp(.55rem, 1.1vw, .66rem);
+  letter-spacing: .06em;
+  color: rgba(26, 26, 26, .4);
+  transition: color .4s var(--ease-field);
+}
+.prova-tick.is-on .prova-tick__idx { color: rgba(26, 26, 26, .78); }
+
+/* 30+ — rede de clientes ativos: nós acendem, arestas ligam, pulso contínuo */
+.prova-network { aspect-ratio: auto; }
+.prova-network__svg { width: 100%; height: auto; overflow: visible; }
+.prova-edge {
+  stroke: rgba(26, 26, 26, .1);
+  stroke-width: 1;
+  transition: stroke-opacity .5s var(--ease-field), stroke-width .5s var(--ease-field);
+}
+.prova-edge.is-on { stroke: var(--prova-c); stroke-opacity: .45; stroke-width: 1.5; }
+.prova-edge.is-signal { animation: prova-signal .9s var(--ease-field); }
+.prova-node__dot {
+  fill: rgba(26, 26, 26, .16);
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(.7);
+  transition: fill .35s var(--ease-field), transform .5s cubic-bezier(.34, 1.8, .5, 1);
+}
+.prova-node__halo {
+  fill: var(--prova-c);
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(.4);
+  transition: opacity .5s var(--ease-field), transform .6s var(--ease-field);
+}
+.prova-node.is-on .prova-node__dot { fill: var(--prova-c); transform: scale(1); }
+.prova-node.is-on .prova-node__halo { opacity: .14; transform: scale(1); }
+/* pulso de atividade sempre na Motriz — o "sinal vivo" da rede */
+.prova-node.is-pulse .prova-node__halo { fill: var(--color-motriz); animation: prova-pulse 1.3s var(--ease-field); }
+.prova-node.is-flash .prova-node__halo { animation: prova-flash .9s var(--ease-field); }
+
+@keyframes prova-pulse {
+  0% { opacity: .5; transform: scale(.6); }
+  100% { opacity: 0; transform: scale(2.4); }
+}
+@keyframes prova-flash {
+  0% { opacity: .55; transform: scale(.8); }
+  100% { opacity: .16; transform: scale(1); }
+}
+@keyframes prova-signal {
+  0% { stroke-opacity: .45; stroke-width: 1.5; }
+  30% { stroke-opacity: 1; stroke-width: 2.6; }
+  100% { stroke-opacity: .45; stroke-width: 1.5; }
+}
+
+/* sem JS: gráficos não existem; com JS e reduced-motion tudo nasce aceso */
+@media (prefers-reduced-motion: reduce) {
+  .prova-tick__fill, .prova-tick__idx, .prova-edge, .prova-node__dot, .prova-node__halo { transition: none; }
+  .prova-node.is-pulse .prova-node__halo, .prova-node.is-flash .prova-node__halo, .prova-edge.is-signal { animation: none; }
+}
+
+@media (max-width: 640px) {
+  .prova-stat__figure { font-size: clamp(7.5rem, 44vw, 11rem); }
+  .prova-ticks { aspect-ratio: 600 / 230; }
+}
 
 /* ==========================================================================
    Footer
@@ -1082,4 +1250,311 @@ main#scroll-content { position: relative; z-index: 1; }
 
 @media (max-width: 640px) {
   .site-nav__link:not(.site-nav__link--cta) { display: none; }
+}
+
+/* ==========================================================================
+   LAYOUT PASS — ajustes de ritmo, grid e tipografia (varredura desktop 1440 /
+   mobile 390). Só layout: nenhuma cor de marca, fonte ou copy muda aqui, e
+   #prova fica de fora (dona: outra frente). Cada sub-bloco diz a seção.
+   ========================================================================== */
+
+/* ---- Global: grid de conteúdo ----
+   .stage é flex (row), então .stage__inner encolhia até a largura do próprio
+   conteúdo e cada seção começava numa coluna diferente (hero 232px, jornada
+   246px, cta 332px em 1440). Largura 100% + max-width = todas as seções
+   alinhadas na mesma borda esquerda do container. */
+.stage:not(#prova) > .stage__inner { width: 100%; }
+/* jornada: o container "wide" (1220px) deslocaria a coluna para fora do grid
+   de 960px das outras seções; a régua de 6 passos cabe em 960px, então ela
+   volta para o container padrão. */
+#jornada > .stage__inner--wide { max-width: var(--container-max); }
+
+/* ---- Global: quebra de linha dos títulos ----
+   evita viúvas ("técnico. A" / "decisão é" + "financeira.") e linhas
+   desequilibradas; funciona com os spans do split (inline-block). */
+.display, .heading, .demo-card__headline, .pillar-list__name { text-wrap: balance; }
+/* tagline do rodapé repete o H1: em 2 linhas ela sempre deixava o "A" órfão
+   ("técnico. A / decisão é financeira."); no desktop cabe numa linha só. */
+@media (min-width: 860px) { .site-footer__tagline { max-width: none; } }
+.lede, .body-text, .demo__lede, .demo-card__body, .demo-card__note, .pillar-list__desc, .scenario__desc { text-wrap: pretty; }
+
+/* ---- #hero: H1 em duas frases ----
+   o balance sozinho ainda escolhia "O dado é técnico. A / decisão é
+   financeira." (o "A" órfão no fim da linha 1). Depois do split (JS), os
+   spans viram itens flex e um ::after de 100% força a quebra entre as duas
+   frases — mesma copy, mesmos spans, nenhuma mudança no motion. Sem JS,
+   fica o texto corrido com balance. */
+#hero-title.is-split { display: flex; flex-wrap: wrap; column-gap: .26em; }
+#hero-title.is-split::after { content: ""; flex-basis: 100%; height: 0; order: 1; }
+#hero-title.is-split .split-word:nth-child(n+5) { order: 2; }
+/* "A decisão é financeira." precisa caber numa linha do container de 960px:
+   teto do display no hero vai de 6.75rem para 6rem (só desktop largo). */
+#hero-title { font-size: clamp(2.75rem, 7.4vw, 6rem); max-width: none; }
+
+/* ---- Header / Footer: logo ----
+   o SVG do wordmark tem ~22% de respiro à esquerda e ~19% acima/abaixo dentro
+   do viewBox; sem compensar, o "V" fica ~20–25px para dentro da borda em que
+   o resto do conteúdo alinha (tagline do rodapé, --edge do header). */
+.brand-mark__logo { --logo-w: clamp(76px, 7vw, 100px); margin-left: calc(var(--logo-w) * -.224); flex-shrink: 0; max-width: none; }
+@media (max-width: 767px) { .brand-mark__logo { --logo-w: 112px; } }
+.site-footer__logo {
+  --logo-w: clamp(90px, 22vw, 110px);
+  margin-left: calc(var(--logo-w) * -.224);
+  margin-block: calc(var(--logo-w) * -.19);
+}
+@media (min-width: 860px) {
+  .site-footer__logo { --logo-w: clamp(72px, 7vw, 88px); }
+  /* com o respiro vertical do SVG compensado, o logo alinha com o topo da nav */
+  .site-footer__brand { gap: 1.35rem; }
+}
+
+/* ---- #transformacao ----
+   nome do pilar herdava line-height 1.5 do body: "Leitura econômico-financeira"
+   quebrava em duas linhas com um vão enorme entre elas. Índice 01/02/03 em
+   vermelho puro sumia sobre o campo vermelho — mantém o vermelho, só ganha
+   peso e sombra de legibilidade como o resto do texto sobre o campo. */
+.pillar-list__name { line-height: 1.2; }
+.stage--leitura-inicio .pillar-list__index { font-weight: 700; text-shadow: 0 1px 10px rgba(0, 0, 3, .55); }
+.stage--leitura-inicio .pillar-list__name { text-shadow: 0 2px 16px rgba(0, 0, 3, .4); }
+
+/* ---- #demonstracao ----
+   card 03: rótulos à esquerda e valores centralizados (herdado do card)
+   liam desalinhados dentro do mesmo módulo — tudo à esquerda agora. */
+.demo-compare { text-align: left; }
+@media (max-width: 640px) {
+  /* sem min-height no mobile, o margin-top:auto zerava e a interface colava
+     no texto do card */
+  .demo-card__interface { margin-top: 2rem; }
+  .demo-card__readout + .demo-card__interface { margin-top: 1.25rem; }
+}
+
+/* ---- #jornada (mobile) ----
+   o ↺ de "Nova leitura" caía sozinho numa linha porque o rótulo é block. */
+@media (max-width: 640px) {
+  .journey__step--return .journey__label { display: inline; }
+  .journey__step--return .journey__desc { margin-top: .35rem; }
+}
+
+/* ---- #cta-final (mobile) ----
+   100vh + conteúdo centralizado abria ~300px vazios entre a assinatura do
+   #agencia e o título do CTA; no mobile a seção usa a altura do conteúdo. */
+@media (max-width: 640px) {
+  #cta-final.stage { min-height: 0; padding-block: clamp(5rem, 22vw, 7rem); }
+  /* em 2 linhas, o flex jogava a seta para a borda direita da tela; como
+     bloco, a seta segue a última palavra */
+  .cta-secondary-line { display: block; text-wrap: balance; }
+  .cta-secondary-line::after { display: inline-block; margin-left: .4em; }
+}
+
+/* ==========================================================================
+   JORNADA v2 (desktop ≥641px) — de "breadcrumb" a trilha com presença.
+   Composição: kicker + título à esquerda, parágrafo à direita (ocupa a metade
+   que ficava vazia), e a trilha de 6 nós na largura inteira do container.
+   • nós sobre um trilho fino; a linha de progresso (gradiente da marca) cresce
+     até o nó ativo — scaleX vindo de journey.ts, mesmo ScrollTrigger de antes;
+   • passo ativo: nó vermelho maior com halo, rótulo em branco pleno, sua
+     descrição logo abaixo dele (cada passo carrega a sua — a legenda
+     compartilhada vira só leitura para leitor de tela);
+   • passos já percorridos (.is-past) ficam "acesos" em meia-luz, os futuros
+     em baixa opacidade — nada sobe/desce de posição (o translateY antigo
+     desalinhava o passo ativo);
+   • ciclo: um arco tracejado sai do 06 e volta ao 01 por cima do trilho, com
+     o ↺ no topo — gira junto quando "Nova leitura" acende (is-looping).
+   Mobile (≤640px) continua com a versão vertical já existente.
+   ========================================================================== */
+@media (min-width: 641px) {
+  #jornada .stage__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "kicker" "heading" "body" "journey";
+  }
+  #jornada .kicker { grid-area: kicker; }
+  #jornada .heading--loop { grid-area: heading; margin-bottom: 1.25rem; }
+  #jornada .stage__inner > .body-text { grid-area: body; margin-bottom: 0; }
+  #jornada .journey { grid-area: journey; }
+
+  .journey {
+    --node: 12px;
+    --col-gap: clamp(.75rem, 1.6vw, 1.5rem);
+    --rail-y: 3.25rem;                       /* centro dos nós, a partir do topo da trilha */
+    --col-w: calc((100% - 5 * var(--col-gap)) / 6);
+    position: relative;
+    margin: clamp(3rem, 6vw, 4.5rem) 0 0;
+    padding-top: calc(var(--rail-y) - var(--node) / 2);
+  }
+
+  /* trilho + progresso */
+  .journey__rail {
+    display: block;
+    position: absolute;
+    top: calc(var(--rail-y) - .5px);
+    left: calc(var(--node) / 2);
+    right: calc(var(--col-w) - var(--node) / 2);
+    height: 1px;
+    background: rgba(237, 237, 237, .18);
+  }
+  .journey__rail-fill {
+    position: absolute;
+    inset: 0;
+    height: 2px; top: -.5px;
+    transform: scaleX(0);
+    transform-origin: left center;
+    background: linear-gradient(90deg, var(--color-motriz), #A63BD1 55%, #4A5FEA);
+    transition: transform .8s var(--ease-field);
+  }
+
+  /* arco de retorno 06 → 01 */
+  .journey::before {
+    content: "";
+    position: absolute;
+    top: .9rem;
+    left: calc(var(--node) / 2);
+    right: calc(var(--col-w) - var(--node) / 2);
+    height: calc(var(--rail-y) - .9rem);
+    border: 1px dashed rgba(237, 237, 237, .2);
+    border-bottom: none;
+    border-radius: 22px 22px 0 0;
+    pointer-events: none;
+    transition: border-color var(--motion-base) var(--ease-field);
+  }
+  .journey::after {
+    content: "↺";
+    content: "↺" / "";
+    position: absolute;
+    top: .9rem;
+    left: calc((100% - var(--col-w) + var(--node)) / 2);
+    transform: translate(-50%, -52%);
+    padding: 0 .5em;
+    font-size: .95rem;
+    line-height: 1;
+    color: rgba(237, 237, 237, .5);
+    transition: color var(--motion-base) var(--ease-field);
+  }
+  .journey.is-looping::before { border-color: rgba(238, 38, 41, .55); }
+  .journey.is-looping::after { color: var(--color-motriz); }
+
+  /* grade de 6 passos */
+  .journey__steps {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    column-gap: var(--col-gap);
+    row-gap: 0;
+    align-items: start;
+  }
+  .journey__step {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: .4em;
+    position: relative;
+    padding-top: calc(var(--node) + 1.35rem);
+    opacity: 1;
+    transform: none;
+  }
+  .journey__step.is-active { transform: none; }
+  .journey__step:not(:last-child)::after { content: none; }
+
+  /* nó */
+  .journey__step::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: var(--node); height: var(--node);
+    border-radius: 50%;
+    background: var(--color-solo-navy);
+    border: 1px solid rgba(237, 237, 237, .4);
+    transition: transform .6s var(--ease-field), background-color .6s var(--ease-field), border-color .6s var(--ease-field), box-shadow .6s var(--ease-field);
+  }
+  .journey__step.is-past::before { background: rgba(237, 237, 237, .75); border-color: transparent; }
+  .journey__step.is-active::before {
+    background: var(--color-motriz);
+    border-color: transparent;
+    transform: scale(1.55);
+    box-shadow: 0 0 0 5px rgba(238, 38, 41, .16), 0 0 22px rgba(238, 38, 41, .6);
+  }
+
+  /* texto do passo */
+  .journey__index,
+  .journey__label,
+  .journey__desc,
+  .journey__return-icon { transition: opacity .6s var(--ease-field), color .6s var(--ease-field); }
+  .journey__index { flex-basis: 100%; margin-bottom: .45rem; font-size: .66rem; opacity: .45; }
+  .journey__label {
+    font-size: clamp(.68rem, 1.05vw, .86rem);
+    font-weight: 500;
+    letter-spacing: .05em;
+    color: rgba(237, 237, 237, .46);
+    text-shadow: 0 2px 14px rgba(0, 0, 3, .45);
+  }
+  .journey__return-icon { opacity: .4; }
+  .journey__desc {
+    display: block;
+    flex-basis: 100%;
+    margin-top: .5rem;
+    font-family: var(--font-mono);
+    font-size: clamp(.66rem, .95vw, .78rem);
+    font-weight: 300;
+    line-height: 1.4;
+    color: rgba(237, 237, 237, .32);
+    text-shadow: 0 2px 14px rgba(0, 0, 3, .45);
+  }
+
+  .journey__step.is-past .journey__label { color: rgba(237, 237, 237, .72); }
+  .journey__step.is-past .journey__desc { color: rgba(237, 237, 237, .48); }
+
+  /* vermelho só no nó/ícone: sobre o campo (que esquenta para vermelho à
+     direita) texto vermelho perdia contraste */
+  .journey__step.is-active .journey__index { opacity: 1; font-weight: 700; }
+  .journey__step.is-active .journey__label { color: var(--color-campo-aberto); font-weight: 600; }
+  .journey__step.is-active .journey__desc { color: rgba(237, 237, 237, .9); }
+  .journey__step--return.is-active .journey__label { color: var(--color-campo-aberto); }
+  .journey__label, .journey__return-icon { line-height: 1.25; }
+  .journey__return-icon { font-size: .9em; }
+
+  /* a legenda compartilhada vira só anúncio para leitor de tela: cada passo
+     já mostra a própria descrição ancorada sob ele */
+  .journey__caption {
+    position: absolute;
+    width: 1px; height: 1px;
+    margin: -1px; padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
+
+/* composição de duas colunas no topo só quando há largura para o título
+   respirar ao lado do parágrafo */
+@media (min-width: 960px) {
+  #jornada .stage__inner {
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    grid-template-areas:
+      "kicker  ."
+      "heading body"
+      "journey journey";
+    column-gap: clamp(2.5rem, 6vw, 5rem);
+    align-items: end;
+  }
+  #jornada .heading--loop { margin-bottom: 0; }
+  #jornada .stage__inner > .body-text { align-self: end; padding-bottom: .35rem; }
+}
+
+/* tablet: colunas de ~95px — "ACOMPANHAMENTO" precisa caber sem invadir o
+   passo seguinte */
+@media (min-width: 641px) and (max-width: 899px) {
+  .journey__label { font-size: .64rem; letter-spacing: .02em; }
+}
+
+/* mobile: passos já percorridos ficam em meia-luz (antes voltavam ao apagado
+   dos futuros e a trilha perdia a noção de progresso) */
+@media (max-width: 640px) {
+  .journey__step.is-past { opacity: .6; }
+  .journey__step.is-past::before { background: rgba(237, 237, 237, .7); }
+}
+
+@media (min-width: 641px) and (prefers-reduced-motion: reduce) {
+  .journey__rail-fill,
+  .journey__step::before,
+  .journey::before,
+  .journey::after { transition: none; }
 }

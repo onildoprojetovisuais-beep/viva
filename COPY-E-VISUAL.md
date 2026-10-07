@@ -64,7 +64,7 @@ Gradiente usado nos gráficos da demonstração: **vermelho → roxo → azul** 
 
 **Copy:** *(título alterado)*
 - Kicker: "O ponto de partida"
-- H2: **"Você visualiza o dado. Mas conhece o risco de impacto no seu negócio?"** ⟵ *antes: "Você conhece o dado. Mas sabe o que ele vale para o negócio?"*
+- H2: **"Você visualiza o dado. Mas conhece o risco do impacto no seu negócio?"** ⟵ *antes: "Você conhece o dado. Mas sabe o que ele vale para o negócio?"*
 - Corpo: "O dado existe. O que falta é a leitura: sem ela, você decide com informação incompleta — e o risco por trás de cada número continua invisível."
 
 ---
@@ -121,7 +121,7 @@ Kicker: "Demonstração visual" · H2: **"Um dado. Múltiplas escolhas."** ⟵ *
 
 **Copy:** *(sem alterações)*
 - Kicker: "No tempo"
-- H2: **"Sua operação não muda em uma tela. Evolui a cada decisão."**
+- H2: **"Sua operação não muda em um dado. Evolui a cada decisão."**
 - Ciclo: Diagnóstico → Leitura → Insight → Decisão → Acompanhamento → **Nova leitura** (volta ao ciclo)
 - Corpo: "O VIVA acompanha sua operação ao longo do tempo — cada decisão gera uma nova leitura, e cada leitura abre uma nova decisão."
 
@@ -163,7 +163,7 @@ A seção "Leitura em ação" (dashboard com KPIs reais de operação, saúde, f
 
 **Copy:** *(sem alterações)*
 - H2: **"Veja o que seus dados ainda não estão mostrando."**
-- Corpo: "Conheça a leitura econômico-financeira da sua operação e enxergue o impacto por trás de cada decisão."
+- Corpo: "Conheça a leitura econômico-financeira da sua operação em Saúde e Segurança do Trabalho e enxergue o impacto em cada decisão."
 - Botão primário: **"Quero uma demonstração"**
 - Link secundário: "Já conheceu o VIVA e quer avançar? Quero acesso"
 

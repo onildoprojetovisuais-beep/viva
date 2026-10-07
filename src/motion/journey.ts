@@ -40,7 +40,10 @@ export function setupJourney(reduced: boolean) {
   };
 
   if (reduced) {
-    steps.forEach((step, i) => step.classList.toggle("is-active", i === lastIndex));
+    steps.forEach((step, i) => {
+      step.classList.toggle("is-active", i === lastIndex);
+      step.classList.toggle("is-past", i < lastIndex);
+    });
     caption.textContent = descriptions[lastIndex];
     caption.classList.add("is-visible");
     if (railFill) railFill.style.transform = "scaleY(1)";
@@ -67,7 +70,10 @@ export function setupJourney(reduced: boolean) {
             closestIndex = i;
           }
         });
-        steps.forEach((step, i) => step.classList.toggle("is-active", i === closestIndex));
+        steps.forEach((step, i) => {
+          step.classList.toggle("is-active", i === closestIndex);
+          step.classList.toggle("is-past", i < closestIndex);
+        });
         setLooping(closestIndex === lastIndex);
       },
     });
@@ -92,7 +98,12 @@ export function setupJourney(reduced: boolean) {
       if (index === currentIndex) return;
       currentIndex = index;
 
-      steps.forEach((step, i) => step.classList.toggle("is-active", i === currentIndex));
+      steps.forEach((step, i) => {
+        step.classList.toggle("is-active", i === currentIndex);
+        step.classList.toggle("is-past", i < currentIndex);
+      });
+      // trilho horizontal (desktop): a linha de progresso chega até o nó ativo
+      if (railFill) railFill.style.transform = `scaleX(${lastIndex ? currentIndex / lastIndex : 1})`;
 
       window.clearTimeout(swapTimer);
       caption.classList.remove("is-visible");

@@ -5,6 +5,8 @@ import { setupTiltCards } from "./motion/tilt-card";
 import { setupJourney } from "./motion/journey";
 import { setupCtaLight } from "./motion/cta-light";
 import { setupScenarioCount } from "./motion/scenario-count";
+import { setupProvaStats } from "./motion/prova-stats";
+import { setupScrollChoreography } from "./motion/scroll-choreography";
 import { prefersReducedMotion } from "./motion/reduced-motion";
 
 const reduced = prefersReducedMotion();
@@ -50,6 +52,8 @@ setupTiltCards(reduced);
 setupJourney(reduced);
 setupCtaLight(reduced);
 setupScenarioCount(reduced);
+setupProvaStats(reduced);
+setupScrollChoreography(reduced);
 
 if (import.meta.env.DEV) {
   (window as any).__viva_debug = { field, documentHidden: () => document.hidden };
