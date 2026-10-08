@@ -88,17 +88,56 @@ body.no-webgl { background: var(--color-solo-navy); }
 
 .site-header {
   position: fixed;
-  top: 0; left: 0; right: 0;
+  top: .7rem; left: clamp(.6rem, 2vw, 1.5rem); right: clamp(.6rem, 2vw, 1.5rem);
   z-index: 30;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: .85rem var(--edge);
-  background: rgba(0, 5, 65, .7);
-  border-bottom: 1px solid rgba(237, 237, 237, .08);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  padding: 10px 28px; /* 1:2 + folga extra nas laterais por causa da curva da cápsula */
+  border-radius: 999px;
+  isolation: isolate;
+  /* Liquid Glass: vidro com volume — tinta escura leve, refração nas bordas (filtro SVG), reflexos e brilho interno */
+  background: linear-gradient(180deg, rgba(255, 255, 255, .1), rgba(255, 255, 255, .02) 55%, rgba(8, 10, 40, .22));
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, .45),
+    inset 0 -1px 1px rgba(255, 255, 255, .18),
+    inset 0 0 22px rgba(255, 255, 255, .07),
+    0 12px 32px -10px rgba(0, 0, 0, .55),
+    0 2px 6px rgba(0, 0, 0, .25);
+  backdrop-filter: blur(14px) saturate(1.6) brightness(1.05);
+  -webkit-backdrop-filter: blur(14px) saturate(1.6) brightness(1.05);
 }
+/* refração real (distorção do fundo nas bordas): só navegadores que aceitam url() em backdrop-filter; os demais ficam com o desfoque acima */
+@supports (backdrop-filter: url(#liquid-glass)) {
+  .site-header { backdrop-filter: blur(14px) url(#liquid-glass) saturate(1.7) brightness(1.06); }
+}
+/* aro de luz: brilha nos cantos opostos, quase some no meio — como a borda de um vidro lapidado */
+.site-header::before {
+  content: "";
+  position: absolute; inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  padding: 1.2px;
+  background: linear-gradient(115deg, rgba(255, 255, 255, .85), rgba(255, 255, 255, .06) 28%, rgba(255, 255, 255, .02) 62%, rgba(255, 255, 255, .55));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  pointer-events: none;
+}
+/* reflexo especular no topo */
+.site-header::after {
+  content: "";
+  position: absolute; inset: 1px 14px auto 14px;
+  height: 46%;
+  z-index: -1;
+  border-radius: 999px 999px 60% 60% / 999px 999px 100% 100%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .22), rgba(255, 255, 255, 0));
+  pointer-events: none;
+}
+@media (max-width: 767px) {
+  .site-header { top: .5rem; padding: 10px 20px; }
+}
+.site-nav__link, .site-nav__link--cta { text-shadow: 0 1px 8px rgba(0, 0, 20, .55); }
 .brand-mark { display: inline-flex; color: var(--color-campo-aberto); }
 .brand-mark__logo { width: clamp(76px, 7vw, 100px); height: auto; }
 @media (max-width: 767px) {
@@ -111,7 +150,9 @@ body.no-webgl { background: var(--color-solo-navy); }
 }
 @media (hover: hover) { .site-nav__link:hover { color: var(--color-campo-aberto); } }
 .site-nav__link--cta {
-  padding: .6rem 1.15rem;
+  white-space: nowrap;
+  padding: 10px 28px; /* 1:2 + folga extra nas laterais para o texto não encostar na curva da cápsula */
+  display: inline-flex; align-items: center; justify-content: center; text-align: center;
   border-radius: 999px;
   border: 1px solid rgba(237, 237, 237, .5);
   color: var(--color-campo-aberto);
@@ -120,6 +161,7 @@ body.no-webgl { background: var(--color-solo-navy); }
 @media (hover: hover) {
   .site-nav__link--cta:hover { border-color: var(--color-campo-aberto); background: rgba(237, 237, 237, .06); }
 }
+@media (max-width: 767px) { .site-nav__link--cta { padding: 10px 20px; font-size: .84rem; } }
 
 /* ==========================================================================
    Estrutura de estágio
@@ -435,9 +477,9 @@ main#scroll-content { position: relative; z-index: 1; }
    ========================================================================== */
 
 .button {
-  display: inline-block;
+  display: inline-flex; align-items: center; justify-content: center; text-align: center;
   margin-top: .5rem;
-  padding: 1rem 1.9rem;
+  padding: 10px 20px;
   border-radius: var(--radius-sm);
   font-weight: 600;
   font-size: 1rem;
